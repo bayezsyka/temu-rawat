@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Doctor;
 use App\Models\Patient;
+use App\Models\PatientAccount;
 use App\Models\PracticeSession;
 use App\Models\Queue;
 use App\Models\User;
@@ -15,29 +17,55 @@ class TemuRawatFlowTest extends TestCase
 
     public function test_patient_registration_creates_a_queue_for_today_session(): void
     {
-        PracticeSession::create([
-            'tanggal' => today(),
-            'status' => PracticeSession::STATUS_BUKA,
-            'nomor_terakhir' => 0,
+        $doctorUser = User::factory()->create([
+            'role' => User::ROLE_DOKTER,
         ]);
 
-        $response = $this->post('/daftar', [
+        $doctor = Doctor::create([
+            'user_id' => $doctorUser->id,
+            'nama' => 'dr. Tes Utama',
+            'status' => Doctor::STATUS_AKTIF,
+        ]);
+
+        $account = PatientAccount::create([
+            'nomor_whatsapp' => '08123456789',
+            'verified_at' => now(),
+        ]);
+
+        $patient = Patient::create([
+            'patient_account_id' => $account->id,
             'nama' => 'Siti Aminah',
             'nomor_whatsapp' => '08123456789',
             'usia' => 29,
             'jenis_kelamin' => 'perempuan',
             'alamat' => 'Makassar',
+        ]);
+
+        PracticeSession::create([
+            'doctor_id' => $doctor->id,
+            'tanggal' => today(),
+            'status' => PracticeSession::STATUS_BUKA,
+            'nomor_terakhir' => 0,
+        ]);
+
+        $session = PracticeSession::query()->firstOrFail();
+
+        $response = $this
+            ->withSession([
+                'patient_account_id' => $account->id,
+                'selected_patient_id' => $patient->id,
+            ])
+            ->post('/daftar', [
+            'patient_id' => $patient->id,
+            'practice_session_id' => $session->id,
             'keluhan' => 'Demam dan batuk',
             'status_kunjungan' => 'baru',
             'metode_daftar' => 'online',
         ]);
 
-        $response->assertRedirect('/antrian/A-001');
+        $queue = Queue::query()->firstOrFail();
 
-        $this->assertDatabaseHas('patients', [
-            'nama' => 'Siti Aminah',
-            'nomor_whatsapp' => '08123456789',
-        ]);
+        $response->assertRedirect("/antrian/{$queue->public_code}");
 
         $this->assertDatabaseHas('queues', [
             'kode_antrian' => 'A-001',
@@ -61,7 +89,13 @@ class TemuRawatFlowTest extends TestCase
             'role' => User::ROLE_ADMIN,
         ]);
 
+        $doctor = Doctor::create([
+            'nama' => 'dr. Panel',
+            'status' => Doctor::STATUS_AKTIF,
+        ]);
+
         $session = PracticeSession::create([
+            'doctor_id' => $doctor->id,
             'tanggal' => today(),
             'status' => PracticeSession::STATUS_BUKA,
             'nomor_terakhir' => 1,
@@ -75,6 +109,7 @@ class TemuRawatFlowTest extends TestCase
         $queue = Queue::create([
             'patient_id' => $patient->id,
             'practice_session_id' => $session->id,
+            'public_code' => 'test-public-code',
             'kode_antrian' => 'A-001',
             'nomor_urut' => 1,
             'keluhan' => 'Pusing',
@@ -85,13 +120,11 @@ class TemuRawatFlowTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->patch(route('panel.queues.status', $queue), [
-                'action' => 'panggil',
-            ])
+            ->post(route('panel.queues.call', $queue))
             ->assertRedirect();
 
         $this->actingAs($user)
-            ->patch(route('panel.queues.initial-check', $queue), [
+            ->post(route('panel.queues.initial', $queue), [
                 'tekanan_darah' => '120/80',
                 'suhu' => 37.2,
                 'catatan_asisten' => 'Pasien tampak lelah',
@@ -100,7 +133,7 @@ class TemuRawatFlowTest extends TestCase
 
         $this->assertDatabaseHas('queues', [
             'id' => $queue->id,
-            'status' => Queue::STATUS_DIPANGGIL,
+            'status' => Queue::STATUS_PEMERIKSAAN_AWAL,
         ]);
 
         $this->assertDatabaseHas('initial_checks', [

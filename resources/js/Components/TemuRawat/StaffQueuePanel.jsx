@@ -1,7 +1,7 @@
 import FlashMessage from '@/Components/TemuRawat/FlashMessage';
 import InitialCheckForm from '@/Components/TemuRawat/InitialCheckForm';
 import StatusBadge from '@/Components/TemuRawat/StatusBadge';
-import useRealtimeReload from '@/Hooks/useRealtimeReload';
+import useRealtimeReload from '@/hooks/useRealtimeReload';
 import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -25,7 +25,7 @@ export default function StaffQueuePanel({ session, queues }) {
 
     useRealtimeReload({
         publicChannels: ['practice-overview', session && `practice-session.${session.id}`],
-        privateChannels: ['panel'],
+        privateChannels: ['staff-panel'],
         only: ['session', 'queues', 'flash'],
     });
 

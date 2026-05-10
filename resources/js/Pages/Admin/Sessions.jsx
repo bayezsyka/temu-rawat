@@ -1,12 +1,12 @@
 import PracticeSessionControl from '@/Components/TemuRawat/PracticeSessionControl';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import useRealtimeReload from '@/Hooks/useRealtimeReload';
+import useRealtimeReload from '@/hooks/useRealtimeReload';
 import { Head } from '@inertiajs/react';
 
 export default function Sessions({ session }) {
     useRealtimeReload({
         publicChannels: ['practice-overview', session && `practice-session.${session.id}`],
-        privateChannels: ['panel'],
+        privateChannels: ['staff-panel'],
         only: ['session', 'flash'],
     });
 

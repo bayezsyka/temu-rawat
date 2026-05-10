@@ -3,37 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Queue;
+use App\Services\PracticeSessionService;
 use App\Services\QueueService;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class QueueController extends Controller
 {
-    public function __construct(protected QueueService $queueService)
-    {
+    public function __construct(
+        protected QueueService $queueService,
+        protected PracticeSessionService $practiceSessionService,
+    ) {
     }
 
-    public function show(string $kode): Response
+    public function show(Queue $queue): Response
     {
-        $queue = Queue::query()
-            ->with(['patient', 'practiceSession', 'initialCheck'])
-            ->where('kode_antrian', $kode)
-            ->firstOrFail();
+        $queue->loadMissing($this->queueService->queueRelations());
 
         return Inertia::render('Queue/Show', [
             'queue' => $this->queueService->serializePatientQueue($queue),
-            'session' => $this->queueService->serializeSessionOverview($queue->practiceSession),
+            'session' => $this->practiceSessionService->serializeSessionCard($queue->practiceSession),
             'remainingBefore' => $this->queueService->remainingBefore($queue),
             'statusMessage' => $this->queueService->patientStatusMessage($queue),
-        ]);
-    }
-
-    public function display(): Response
-    {
-        return Inertia::render('Display/Index', [
-            'session' => $this->queueService->serializeSessionOverview(
-                $this->queueService->getTodaySession(),
-            ),
         ]);
     }
 }

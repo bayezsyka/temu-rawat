@@ -25,7 +25,8 @@ class PracticeSessionUpdated implements ShouldBroadcast
         return [
             new Channel("practice-session.{$this->practiceSession->id}"),
             new Channel('practice-overview'),
-            new PrivateChannel('panel'),
+            new PrivateChannel('staff-panel'),
+            new PrivateChannel("doctor.{$this->practiceSession->doctor_id}"),
         ];
     }
 

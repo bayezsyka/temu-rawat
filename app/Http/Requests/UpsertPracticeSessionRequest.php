@@ -15,9 +15,9 @@ class UpsertPracticeSessionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_dokter' => ['nullable', 'string', 'max:255'],
+            'doctor_id' => ['required', 'integer', 'exists:doctors,id'],
+            'tanggal' => ['nullable', 'date'],
             'status' => ['required', Rule::in(['buka', 'istirahat', 'selesai'])],
-            'nomor_awal' => ['nullable', 'integer', 'min:1', 'max:999'],
         ];
     }
 }

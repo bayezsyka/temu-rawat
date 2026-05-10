@@ -2,24 +2,34 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Model;
 
 class Queue extends Model
 {
     public const STATUS_TERDAFTAR = 'terdaftar';
+
     public const STATUS_MENUNGGU = 'menunggu';
+
     public const STATUS_DIPANGGIL = 'dipanggil';
+
+    public const STATUS_PEMERIKSAAN_AWAL = 'pemeriksaan_awal';
+
     public const STATUS_DIPERIKSA = 'diperiksa';
+
     public const STATUS_SELESAI = 'selesai';
+
     public const STATUS_DILEWATI = 'dilewati';
+
     public const STATUS_BATAL = 'batal';
 
     public const STATUS_KUNJUNGAN_BARU = 'baru';
+
     public const STATUS_KUNJUNGAN_LAMA = 'lama';
 
     public const METODE_ONLINE = 'online';
+
     public const METODE_LANGSUNG = 'langsung';
 
     public const STATUS_KUNJUNGAN = [
@@ -35,6 +45,7 @@ class Queue extends Model
     public const STATUS_AKTIF = [
         self::STATUS_MENUNGGU,
         self::STATUS_DIPANGGIL,
+        self::STATUS_PEMERIKSAAN_AWAL,
         self::STATUS_DIPERIKSA,
     ];
 
@@ -46,6 +57,7 @@ class Queue extends Model
     protected $fillable = [
         'patient_id',
         'practice_session_id',
+        'public_code',
         'kode_antrian',
         'nomor_urut',
         'keluhan',
@@ -54,6 +66,7 @@ class Queue extends Model
         'status',
         'waktu_daftar',
         'waktu_dipanggil',
+        'waktu_mulai_awal',
         'waktu_mulai_periksa',
         'waktu_selesai',
     ];
@@ -63,6 +76,7 @@ class Queue extends Model
         return [
             'waktu_daftar' => 'datetime',
             'waktu_dipanggil' => 'datetime',
+            'waktu_mulai_awal' => 'datetime',
             'waktu_mulai_periksa' => 'datetime',
             'waktu_selesai' => 'datetime',
         ];
@@ -81,6 +95,11 @@ class Queue extends Model
     public function initialCheck(): HasOne
     {
         return $this->hasOne(InitialCheck::class);
+    }
+
+    public function medicalVisit(): HasOne
+    {
+        return $this->hasOne(MedicalVisit::class);
     }
 
     public function isTerminal(): bool

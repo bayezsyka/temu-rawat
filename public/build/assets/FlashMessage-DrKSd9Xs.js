@@ -1,0 +1,1 @@
+import{t as e}from"./app-D9RT4SQQ.js";var t=e();function n({flash:e}){return!e?.success&&!e?.error?null:(0,t.jsx)(`div`,{className:`rounded-2xl border px-4 py-3 text-sm ${e.error?`border-rose-200 bg-rose-50 text-rose-700`:`border-emerald-200 bg-emerald-50 text-emerald-700`}`,children:e.error||e.success})}export{n as t};

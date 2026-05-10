@@ -22,10 +22,13 @@ abstract class BroadcastQueueEvent implements ShouldBroadcast
 
     public function broadcastOn(): array
     {
+        $doctorId = $this->queue->practiceSession?->doctor_id;
+
         return [
             new Channel("practice-session.{$this->queue->practice_session_id}"),
             new Channel('practice-overview'),
-            new PrivateChannel('panel'),
+            new PrivateChannel('staff-panel'),
+            new PrivateChannel("doctor.{$doctorId}"),
             new PrivateChannel("queue.{$this->queue->id}"),
         ];
     }

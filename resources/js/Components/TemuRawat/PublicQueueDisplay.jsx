@@ -1,5 +1,5 @@
 import StatusBadge from '@/Components/TemuRawat/StatusBadge';
-import useRealtimeReload from '@/Hooks/useRealtimeReload';
+import useRealtimeReload from '@/hooks/useRealtimeReload';
 import { useEffect, useState } from 'react';
 
 export default function PublicQueueDisplay({ session }) {

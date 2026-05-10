@@ -19,6 +19,7 @@ class UpdateInitialCheckRequest extends FormRequest
             'tinggi_badan' => ['nullable', 'numeric', 'min:0', 'max:999.99'],
             'suhu' => ['nullable', 'numeric', 'min:0', 'max:99.9'],
             'nadi' => ['nullable', 'integer', 'min:0', 'max:999'],
+            'saturasi_oksigen' => ['nullable', 'integer', 'min:0', 'max:100'],
             'catatan_asisten' => ['nullable', 'string', 'max:1000'],
         ];
     }

@@ -1,7 +1,7 @@
 import FlashMessage from '@/Components/TemuRawat/FlashMessage';
 import StatusBadge from '@/Components/TemuRawat/StatusBadge';
-import useRealtimeReload from '@/Hooks/useRealtimeReload';
-import { usePage } from '@inertiajs/react';
+import useRealtimeReload from '@/hooks/useRealtimeReload';
+import { Link, usePage } from '@inertiajs/react';
 
 export default function PatientQueueStatus({
     queue,
@@ -14,6 +14,7 @@ export default function PatientQueueStatus({
     useRealtimeReload({
         publicChannels: ['practice-overview', session && `practice-session.${session.id}`],
         only: ['queue', 'session', 'remainingBefore', 'statusMessage'],
+        pollInterval: window.Echo ? null : 10000,
     });
 
     return (
@@ -34,11 +35,26 @@ export default function PatientQueueStatus({
                 </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
+                <MetricCard label="Dokter" value={session?.doctor?.nama || '-'} />
                 <MetricCard label="Nomor sedang dilayani" value={session?.current_queue?.kode_antrian || 'Belum ada'} />
                 <MetricCard label="Sisa sebelum Anda" value={String(remainingBefore)} />
                 <MetricCard label="Status praktik" value={session?.status || 'Belum dibuka'} />
             </div>
+
+            {queue.medical_visit?.summary_url ? (
+                <div className="rounded-[1.75rem] border border-slate-200 bg-white/90 p-5 shadow-sm">
+                    <p className="text-sm text-slate-600">
+                        Jika kunjungan sudah selesai, ringkasan hasil dan resep pasien hanya tersedia selama 7 hari.
+                    </p>
+                    <Link
+                        href={queue.medical_visit.summary_url}
+                        className="mt-4 inline-flex rounded-3xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-teal-700"
+                    >
+                        Buka ringkasan hasil
+                    </Link>
+                </div>
+            ) : null}
         </div>
     );
 }

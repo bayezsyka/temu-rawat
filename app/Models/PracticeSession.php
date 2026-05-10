@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PracticeSession extends Model
 {
     public const STATUS_BUKA = 'buka';
+
     public const STATUS_ISTIRAHAT = 'istirahat';
+
     public const STATUS_SELESAI = 'selesai';
 
     public const STATUSES = [
@@ -18,17 +21,27 @@ class PracticeSession extends Model
     ];
 
     protected $fillable = [
+        'doctor_id',
         'tanggal',
         'nama_dokter',
         'status',
         'nomor_terakhir',
+        'mulai_pada',
+        'selesai_pada',
     ];
 
     protected function casts(): array
     {
         return [
-            'tanggal' => 'date:Y-m-d',
+            'tanggal' => 'date',
+            'mulai_pada' => 'datetime',
+            'selesai_pada' => 'datetime',
         ];
+    }
+
+    public function doctor(): BelongsTo
+    {
+        return $this->belongsTo(Doctor::class);
     }
 
     public function queues(): HasMany

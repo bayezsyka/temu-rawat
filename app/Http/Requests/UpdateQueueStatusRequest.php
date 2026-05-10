@@ -17,10 +17,10 @@ class UpdateQueueStatusRequest extends FormRequest
         return [
             'action' => ['required', Rule::in([
                 'panggil',
+                'mulai_awal',
                 'mulai_periksa',
-                'selesai',
                 'lewati',
-                'batalkan',
+                'batal',
             ])],
         ];
     }
