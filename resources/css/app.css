@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --surface: #f4fbfb;
+        --ink: #12303b;
+    }
+
+    body {
+        color: var(--ink);
+        background:
+            radial-gradient(circle at top left, rgba(211, 244, 239, 0.9), transparent 30%),
+            linear-gradient(180deg, #fcfffe 0%, var(--surface) 52%, #eef8f9 100%);
+        min-height: 100vh;
+    }
+}
